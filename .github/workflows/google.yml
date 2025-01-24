@@ -1,117 +1,1280 @@
-from flask import Flask, request, jsonify
-from email_validator import validate_email, EmailNotValidError
-import openai
-import smtplib
-
-app = Flask(__name__)
-
-# Set OpenAI API key
-openai.api_key = "your_openai_api_key_here"
-
-# SMTP Settings for sending email (e.g., Gmail)
-SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 587
-SMTP_EMAIL = "your_email@gmail.com"
-SMTP_PASSWORD = "your_email_password"  # Use an App Password for Gmail
-
-# Dummy storage for registered users
-users = {}
-
-@app.route('/register', methods=['POST'])
-def register():
-    """Register a user with email validation."""
-    data = request.json
-    email = data.get('email')
-
-    # Validate email
-    try:
-        valid = validate_email(email)
-        email = valid.email
-    except EmailNotValidError as e:
-        return jsonify({"error": str(e)}), 400
-
-    if email in users:
-        return jsonify({"message": "User already registered."}), 200
-
-    # Save user (dummy storage)
-    users[email] = {"is_premium": False}
-    return jsonify({"message": "User registered successfully."}), 201
-
-
-@app.route('/ask', methods=['POST'])
-def ask():
-    """Ask a question and trigger GPT response."""
-    data = request.json
-    email = data.get('email')
-    question = data.get('question')
-
-    # Check if email is registered
-    if email not in users:
-        return jsonify({"error": "User not found. Please register first."}), 404
-
-    # Trigger GPT response
-    try:
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=question,
-            max_tokens=150
-        )
-        answer = response['choices'][0]['text'].strip()
-        return jsonify({"question": question, "answer": answer}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route('/send-email', methods=['POST'])
-def send_email():
-    """Send email to a user."""
-    data = request.json
-    email = data.get('email')
-    subject = data.get('subject')
-    body = data.get('body')
-
-    # Check if email is registered
-    if email not in users:
-        return jsonify({"error": "User not found. Please register first."}), 404
-
-    # Send email using SMTP
-    try:
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.starttls()
-            server.login(SMTP_EMAIL, SMTP_PASSWORD)
-            message = f"Subject: {subject}\n\n{body}"
-            server.sendmail(SMTP_EMAIL, email, message)
-
-        return jsonify({"message": "Email sent successfully."}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-python app.py
 {
-    "email": "user@example.com"
+"status": "ok",
+"totalResults": 6806,
+-"articles": [
+-{
+-"source": {
+"id": "the-times-of-india",
+"name": "The Times of India"
+},
+"author": "The Feed",
+"title": "Heil Tesla! German activist group projects a huge image of Elon Musk's Nazi salute onto Gigafactory, labels it the commercial arm of fascism; video goes viral on social media",
+"description": "A gigantic image of Elon Musk's Nazi salute has now been projected at Tesla's German Gigafactory, sparking new rows about fascism. Germay has been quite sentimental when it comes to Nazism and 'Seig Heil', and activists in the country are using the now-infamo…",
+"url": "https://economictimes.indiatimes.com/news/international/us/heil-tesla-german-activist-group-projects-a-huge-image-of-elon-musks-nazi-salute-onto-gigafactory-labels-it-the-commercial-arm-of-fascism-video-goes-viral-on-social-media/articleshow/117537973.cms",
+"urlToImage": "https://img.etimg.com/thumb/msid-117537960,width-1200,height-630,imgsize-914731,overlay-economictimes/articleshow.jpg",
+"publishedAt": "2025-01-24T23:03:37Z",
+"content": "Artificial Intelligence(AI)\r\nAI and Analytics based Business Strategy\r\nBy - Tanusree De, Managing Director- Accenture Technology Lead, Trustworthy AI Center of Excellence: ATCI\r\nView Program"
+},
+-{
+-"source": {
+"id": null,
+"name": "New York Post"
+},
+"author": "Natalie O'Neill",
+"title": "Astronomers announce discovery of new asteroid — only to learn it’s a Tesla sports car hurling through space",
+"description": "The Minor Planet Center in Cambridge, Mass., officially registered the new space rock Jan. 2, saying it was spotted hurling through the final frontier roughly 150,000 miles from Earth, according to Astronomy magazine.",
+"url": "https://nypost.com/2025/01/24/us-news/astronomers-announce-discovery-of-new-asteroid-only-to-learn-its-a-tesla-sports-car-hurling-through-space/",
+"urlToImage": "https://nypost.com/wp-content/uploads/sites/2/2025/01/97264386.jpg?quality=75&strip=all&w=1024",
+"publishedAt": "2025-01-24T22:55:34Z",
+"content": "Total space cadets!\r\nHarvard University-affiliated astronomers announced the discovery of a new asteroid zooming precariously close to Earth  only to learn it was actually a Tesla sports car launched… [+1824 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Investing.com"
+},
+"author": "Reuters",
+"title": "Ben & Jerry's accuses Unilever of muzzling it because of Trump",
+"description": "Ben & Jerry's accuses Unilever of muzzling it because of Trump",
+"url": "https://www.investing.com/news/stock-market-news/ben--jerrys-accuses-unilever-of-muzzling-it-because-of-trump-3830628",
+"urlToImage": "https://i-invdn-com.investing.com/news/LYNXNPEB6J0AJ_L.jpg",
+"publishedAt": "2025-01-24T22:47:34Z",
+"content": "By Jessica DiNapoli and Jonathan Stempel\r\nNEW YORK (Reuters) - Ben &amp; Jerry's on Friday ratcheted up its censorship lawsuit against Unilever (LON:ULVR), accusing its parent company of suppressing … [+3688 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "TMZ"
+},
+"author": "TMZ Staff",
+"title": "Antisemitic Graffiti Scrawled Near L.A.'s Holocaust Museum",
+"description": "An outrageous display of antisemitism is scrawled virtually on the doorstep of L.A.'s Holocaust Museum -- freshly scrawled graffiti to button up a week when Elon Musk's controversial Inauguration Day salute is still sparking heated debate. A…\n Permalink",
+"url": "https://www.tmz.com/2025/01/24/antisemitic-graffiti-near-los-angeles-holocaust-museum-pan-pacific-park/",
+"urlToImage": "https://imagez.tmz.com/image/72/16by9/2025/01/24/7291934e0ce7472388ce5ac5b9964a41_xl.jpg",
+"publishedAt": "2025-01-24T22:30:51Z",
+"content": "An outrageous display of antisemitism is scrawled virtually on the doorstep of L.A.'s Holocaust Museum -- freshly scrawled graffiti to button up a week when Elon Musk's controversial Inauguration Day… [+1859 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "TMZ"
+},
+"author": "TMZ Staff",
+"title": "Pax Jolie-Pitt Crashes E-Bike Into Car, Causes Huge Dent",
+"description": "Angelina Jolie and Brad Pitt's son, Pax Jolie-Pitt, keeps playing with fire ... because he crashed his e-bike again ... smashing into a car and causing major damage. The 21-year-old was tooling around in Los Feliz on his BMX-style electric bicycle…",
+"url": "https://www.tmz.com/2025/01/24/angelina-jolie-brad-pitt-son-pax-e-bike-crash-hits-car/",
+"urlToImage": "https://imagez.tmz.com/image/7e/16by9/2025/01/24/7e33a2874c3b4eef8ee90a728ffe2739_xl.jpg",
+"publishedAt": "2025-01-24T22:30:12Z",
+"content": "Angelina JolieandBrad Pitt's son, Pax Jolie-Pitt, keeps playing with fire ... because he crashed his e-bike again ... smashing into a car and causing major damage.\r\nThe 21-year-old was tooling around… [+1048 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Electrek"
+},
+"author": "Jameson Dow",
+"title": "Kia’s NACS adapters available now; Supercharger access still pending",
+"description": "Kia’s official first-party NACS adapters are now ready to ship out, but owners will have to wait to use them on Tesla Superchargers until later this quarter.\n\n\n\n more…",
+"url": "http://electrek.co/2025/01/24/kias-nacs-adapters-available-now-supercharger-access-still-pending/",
+"urlToImage": "https://i0.wp.com/electrek.co/wp-content/uploads/sites/3/2024/09/Kia-NACS-Hyundai-Tesla.jpg?resize=1200%2C628&quality=82&strip=all&ssl=1",
+"publishedAt": "2025-01-24T22:28:58Z",
+"content": "Kia’s official first-party NACS adapters are now ready to ship out, but owners will have to wait to use them on Tesla Superchargers until later this quarter.\r\nThe rollout of Supercharger access to no… [+3405 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "TheWrap"
+},
+"author": "Sean Burch",
+"title": "Elon Musk Says X Growth Is ‘Stagnant,’ Revenue Is ‘Unimpressive’ in Leaked Email to Staff",
+"description": "The X boss warns his employees the platform is not growing fast despite \"shaping national conversations and outcomes,\" the WSJ reports\nThe post Elon Musk Says X Growth Is ‘Stagnant,’ Revenue Is ‘Unimpressive’ in Leaked Email to Staff appeared first on TheWrap.",
+"url": "https://www.thewrap.com/elon-musk-x-growth-stagnant-twitter-revenue/",
+"urlToImage": "https://www.thewrap.com/wp-content/uploads/2024/02/elon-musk-advertising.jpg",
+"publishedAt": "2025-01-24T22:13:07Z",
+"content": "X owner Elon Musk said growth on his platform is stagnant and revenue is unimpressive in a January email to staff that was reported by the Wall Street Journal on Friday.\r\nAnd were barely breaking eve… [+1653 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "New York Post"
+},
+"author": "Fox News",
+"title": "Burgers don’t have to be unhealthy — these are the five best for your body",
+"description": "These are the best choices for your waistline.",
+"url": "https://nypost.com/2025/01/24/lifestyle/top-5-fast-food-burgers-for-your-health-says-new-study/",
+"urlToImage": "https://nypost.com/wp-content/uploads/sites/2/2025/01/97265590.jpg?quality=75&strip=all&w=1024",
+"publishedAt": "2025-01-24T22:12:12Z",
+"content": "As President Donald Trump settles into his second term in the White House, his love of burgers is well-known.\r\nIn Texas, a Trump-themed restaurant inspired by the president’s penchant for burgers ope… [+6061 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Motley Fool Australia"
+},
+"author": "James Mickleboro",
+"title": "4 of the best ASX ETFs to buy now",
+"description": "Let's see why these funds could be among the best out there for Aussie investors.\nThe post 4 of the best ASX ETFs to buy now appeared first on The Motley Fool Australia.",
+"url": "https://www.fool.com.au/2025/01/25/4-of-the-best-asx-etfs-to-buy-now/",
+"urlToImage": "https://www.fool.com.au/wp-content/uploads/2022/05/Trendy-investing-everybodys-doing-it-16_9-1200x675.jpg",
+"publishedAt": "2025-01-24T22:05:00Z",
+"content": "A new month is on the horizon, so what better time to make some new additions to your investment portfolio.\r\nIf exchange traded funds (ETFs) are of interest to you, then it could be worth taking a lo… [+3167 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Jalopnik"
+},
+"author": "Lawrence Hodge",
+"title": "GMC Sierra EV Denali Goes 507 Miles In Edmunds' Range Test, But It’s Not Very Efficient",
+"description": "The GMC Sierra EV Denali just claimed the top spot on Edmunds’ EV range testing leaderboard by traveling 507 miles on a single charge, beating the previous record holder, the Lucid Air Dream Edition by one mile. Edmundssays it was able to achieve this range u…",
+"url": "https://jalopnik.com/gmc-sierra-ev-denali-goes-507-miles-in-edmunds-range-te-1851747491",
+"urlToImage": "https://i.kinja-img.com/image/upload/c_fill,h_675,pg_1,q_80,w_1200/6c740d6a882621380c898d1cdf362b13.jpg",
+"publishedAt": "2025-01-24T22:00:00Z",
+"content": "The GMC Sierra EV Denali just claimed the top spot on Edmunds EV range testing leaderboard by traveling 507 miles on a single charge, beating the previous record holder, the Lucid Air Dream Edition b… [+2298 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Phandroid - News for Android"
+},
+"author": "Mike Viray",
+"title": "The Xiaomi 15 Now Comes in Red, but There’s a Catch",
+"description": "It's exclusive for Chinese markets.\nThe post The Xiaomi 15 Now Comes in Red, but There’s a Catch appeared first on Phandroid.",
+"url": "https://phandroid.com/2025/01/24/the-xiaomi-15-now-comes-in-red-but-theres-a-catch/",
+"urlToImage": "https://phandroid.com/wp-content/uploads/2025/01/xiaomi-15-red.png",
+"publishedAt": "2025-01-24T21:46:53Z",
+"content": "While it’s been quite some time now since the launch of the Xiaomi 15, there’s still a lot of hype for Xiaomi’s premium-tier smartphone, and the company recently announced that it was launching a new… [+1043 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Electrek"
+},
+"author": "Peter Johnson",
+"title": "BYD’s electric SUV racks up +1,000 preorders in Korea and it just launched last week",
+"description": "BYD is now taking Hyundai and Kia’s home market by storm. After launching the electric SUV just last week, BYD said its EV has already secured over 1,000 preorders in South Korea. Can it compete with Hyundai and Kia’s new low-cost EVs?\n\n\n\n more…",
+"url": "http://electrek.co/2025/01/24/byd-atto-3-ev-racks-up-1000-preorders-korea-just-one-week/",
+"urlToImage": "https://i0.wp.com/electrek.co/wp-content/uploads/sites/3/2025/01/BYD-EV-preorders-Korea.jpeg?resize=1200%2C628&quality=82&strip=all&ssl=1",
+"publishedAt": "2025-01-24T21:41:47Z",
+"content": "BYD is now taking Hyundai and Kia’s home market by storm. After launching the electric SUV just last week, BYD said its EV has already secured over 1,000 preorders in South Korea. Can it compete with… [+2167 chars]"
+},
+-{
+-"source": {
+"id": "business-insider",
+"name": "Business Insider"
+},
+"author": "Alice Tecotzky",
+"title": "DOGE announces results from its first 80 hours of work — and it's way behind schedule",
+"description": "The group on X said that it had cancelled around $420 million in contracts, putting it on track to reach 3% of Musk's initial cost-cutting target.",
+"url": "https://www.businessinsider.com/elon-musk-doge-early-spending-dei-contracts-2025-1",
+"urlToImage": "https://i.insider.com/6793fe6d196626c40984fd47?width=1200&format=jpeg",
+"publishedAt": "2025-01-24T21:39:30Z",
+"content": "Elon Musk is heading up DOGE, which aims to downsize federal government.Kenny Holston-Pool/Getty Images\r\n<ul><li>The Department of Government Efficiency said it cancelled $420 million in contracts in… [+2728 chars]"
+},
+-{
+-"source": {
+"id": "the-times-of-india",
+"name": "The Times of India"
+},
+"author": "The Feed",
+"title": "Elon Musk's feud with Wikipedia intensifies after editors updated his page to reflect his alleged Nazi salute at Donald Trump's inauguration",
+"description": "During recent times, the feud between Tesla CEO Elon Musk and Wikipedia takes a significant turn again following the Wikipedia editors updated the page of Elon Musk which now eventually reflects his alleged Nazi salute at the inauguration of US President Dona…",
+"url": "https://economictimes.indiatimes.com/news/international/us/elon-musks-feud-with-wikipedia-intensifies-after-editors-updated-his-page-to-reflect-his-alleged-nazi-salute-at-donald-trumps-inauguration/articleshow/117535546.cms",
+"urlToImage": "https://img.etimg.com/thumb/msid-117535549,width-1200,height-630,imgsize-43834,overlay-economictimes/articleshow.jpg",
+"publishedAt": "2025-01-24T21:24:09Z",
+"content": "Artificial Intelligence(AI)\r\nAI and Analytics based Business Strategy\r\nBy - Tanusree De, Managing Director- Accenture Technology Lead, Trustworthy AI Center of Excellence: ATCI\r\nView Program"
+},
+-{
+-"source": {
+"id": null,
+"name": "CNBC"
+},
+"author": null,
+"title": "Alphabet shares close above $200 for first time on split-adjusted basis",
+"description": "Investors are growing more bullish on Alphabet as the company speeds up its AI development.",
+"url": "https://www.cnbc.com/2025/01/24/alphabet-shares-close-above-200-value-for-first-time.html",
+"urlToImage": "https://image.cnbcfm.com/api/v1/image/107183746-1674657377896-gettyimages-1241203566-CEO_SUMMIT_AMERICAS.jpeg?v=1729794152&w=1920&h=1080",
+"publishedAt": "2025-01-24T21:21:45Z",
+"content": "Alphabet shares closed at $200 per share for the first time on Friday as investors grow increasingly bullish on the company's opportunities in artificial intelligence.\r\nThe stock gained 1.1% on Frida… [+1957 chars]"
+},
+-{
+-"source": {
+"id": "newsweek",
+"name": "Newsweek"
+},
+"author": "James Bickerton",
+"title": "Nazi Concentration Camp Memorial Attacks Elon Musk: 'Mad Extremist'",
+"description": "Elon Musk has endorsed right-wing parties in Europe, including Alternative for Germany and Reform UK.",
+"url": "https://www.newsweek.com/nazi-concentration-camp-memorial-attacks-elon-musk-mad-extremist-2020636",
+"urlToImage": "https://d.newsweek.com/en/full/2573259/elon-musk.jpg",
+"publishedAt": "2025-01-24T20:56:04Z",
+"content": "Elon Musk has been condemned as \"a mixture of mad and right-wing extremist\" by professor Jens-Christian Wagner, a historian who runs the Buchenwald concentration camp memorial, the largest in Germany… [+4567 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Decrypt"
+},
+"author": "Mathew Di Salvo",
+"title": "Elizabeth Warren Takes Aim at Elon Musk's DOGE: 'A Venue for Corruption'",
+"description": "Senator Elizabeth Warren has suggested a long list of ways that Elon Musk's cost-cutting DOGE can save money—though she's deeply skeptical.",
+"url": "https://decrypt.co/302622/elizabeth-warren-elon-musk-doge-corruption",
+"urlToImage": "https://cdn.decrypt.co/resize/1024/height/512/wp-content/uploads/2025/01/musk-warren-gID_7.png",
+"publishedAt": "2025-01-24T20:52:04Z",
+"content": "Democratic senator Elizabeth Warren is going hard after Elon Musk and his cost-cutting Department of Government Efficiency, aka DOGEyes, like the meme coinclaiming that the new body appears to be a v… [+3076 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Electrek"
+},
+"author": "Fred Lambert",
+"title": "Podcast: new Tesla Model Y launches in NA/EU, Rivian is popular, Trump’s effect on EVs, and more",
+"description": "In the Electrek Podcast, we discuss the most popular news in the world of sustainable transport and energy. In this week’s episode, we discuss the new Tesla Model Y launching in NA/EU, Rivian getting popular with OEMs, Trump’s effect on EVs, and more.\n\n\n\n mor…",
+"url": "http://electrek.co/2025/01/24/podcast-new-tesla-model-y-launches-in-na-eu-rivian-is-popular-trumps-effect-on-evs-and-more/",
+"urlToImage": "https://i0.wp.com/electrek.co/wp-content/uploads/sites/3/2017/12/business_card-1.jpg?resize=1200%2C628&quality=82&strip=all&ssl=1",
+"publishedAt": "2025-01-24T20:35:29Z",
+"content": "In the Electrek Podcast, we discuss the most popular news in the world of sustainable transport and energy. In this weeks episode, we discuss the new Tesla Model Y launching in NA/EU, Rivian getting … [+818 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Slashdot.org"
+},
+"author": "feedfeeder",
+"title": "Stock market today: Wall Street hangs near its record as it heads for a 2nd straight winning week - The Associated Press",
+"description": "Stock market today: Wall Street hangs near its record as it heads for a 2nd straight winning weekThe Associated Press Stocks fall as rally pauses, but S&P 500 heads for weekly gain: Live updatesCNBC S&P 500 Sees Best Start for a President Since 1985: Markets …",
+"url": "https://slashdot.org/firehose.pl?op=view&amp;id=176035427",
+"urlToImage": null,
+"publishedAt": "2025-01-24T20:33:00Z",
+"content": "The Fine Print: The following comments are owned by whoever posted them. We are not responsible for them in any way."
+},
+-{
+-"source": {
+"id": null,
+"name": "Securityaffairs.com"
+},
+"author": "Pierluigi Paganini",
+"title": "U.S. CISA adds SonicWall SMA1000 flaw to its Known Exploited Vulnerabilities catalog",
+"description": "U.S. Cybersecurity and Infrastructure Security Agency (CISA) adds SonicWall SMA1000 vulnerability to its Known Exploited Vulnerabilities catalog. The U.S. Cybersecurity and Infrastructure Security Agency (CISA) added a SonicWall SMA1000 Appliance Management C…",
+"url": "https://securityaffairs.com/173417/security/u-s-cisa-adds-sonicwall-sma1000-flaw-known-exploited-vulnerabilities-catalog.html",
+"urlToImage": "https://securityaffairs.com/wp-content/uploads/2020/07/CISA.jpeg",
+"publishedAt": "2025-01-24T20:01:38Z",
+"content": "U.S. CISA adds SonicWall SMA1000 flaw to its Known Exploited Vulnerabilities catalog\r\n | J-magic malware campaign targets Juniper routers\r\n | SonicWall warns of a critical CVE-2025-23006 zero-day lik… [+133782 chars]"
+},
+-{
+-"source": {
+"id": "fox-news",
+"name": "Fox News"
+},
+"author": "Christine Rousselle",
+"title": "Top 5 fast-food burgers for your health, says new study",
+"description": "Not all fast-food burgers are created equal. The food website Delish recently highlighted some of its picks for the healthiest burger options. Here are five, plus smart nutrition tips.",
+"url": "https://www.foxnews.com/food-drink/top-5-fast-food-burgers-health-says-new-study",
+"urlToImage": "https://static.foxnews.com/foxnews.com/content/uploads/2025/01/woman-enjoys-burger.jpg",
+"publishedAt": "2025-01-24T20:00:16Z",
+"content": "As President Donald Trump settles into his second term in the White House, his love of burgers is well-known.\r\nIn Texas, a Trump-themed restaurant inspired by the president's penchant for burgers ope… [+5903 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Newser"
+},
+"author": "Jenn Gidman",
+"title": "Trump Softens His Rhetoric on China",
+"description": "The three \"T's\" were on the agenda during President Trump's phone call, ahead of his inauguration, with Chinese President Xi Jinping last week: TikTok, trade, and Taiwan, reports Reuters . And it was \"a good, friendly conversation\" that \"went fine,\" Trump tol…",
+"url": "https://www.newser.com/story/363131/china-xi-call-with-trump-was-exceedingly-warm.html",
+"urlToImage": "https://img1-azrcdn.newser.com/image/1587448-12-20250124141301.jpeg",
+"publishedAt": "2025-01-24T19:47:44Z",
+"content": "The three \"T's\" were on the agenda during President Trump's phone call, ahead of his inauguration, with Chinese President Xi Jinping last week: TikTok, trade, and Taiwan, reports Reuters. And it was … [+1776 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Securityaffairs.com"
+},
+"author": "Pierluigi Paganini",
+"title": "J-magic malware campaign targets Juniper routers",
+"description": "Threat actors are targeting Juniper routers with a custom backdoor in a campaign called code-named “J-magic,” attackers are exploiting a Magic Packet flaw. Lumen Technologies researchers reported that the J-magic campaign targets Juniper routers with a custom…",
+"url": "https://securityaffairs.com/173408/security/j-magic-malware-campaign-targets-juniper-routers.html",
+"urlToImage": "https://securityaffairs.com/wp-content/uploads/2025/01/J-magic-malware-campaign-targets-Juniper-routers.jpg",
+"publishedAt": "2025-01-24T19:35:51Z",
+"content": "J-magic malware campaign targets Juniper routers\r\n | SonicWall warns of a critical CVE-2025-23006 zero-day likely exploited in the wild\r\n | U.S. CISA adds JQuery flaw to its Known Exploited Vulnerabi… [+133693 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Electrek"
+},
+"author": "Reinette LeJeune",
+"title": "Tenways Valentine’s sale takes up to $700 off e-bikes, Autel 40A level 2 EV charger $391, Hoverfly, Jackery, Lectric, more",
+"description": "Closing out this week’s Green Deals is Tenways’ Valentine’s Day sale, which is taking up to $500 off its e-bikes with an additional $200 in savings taken off the order for two models together – and their getting up to $307 in free gear on top of it all. The s…",
+"url": "http://electrek.co/2025/01/24/tenways-cgo600-pro-e-bike-valentines-sale-more/",
+"urlToImage": "https://i0.wp.com/electrek.co/wp-content/uploads/sites/3/2024/10/TENWAYS-CGO600-Pro-e-bike-2.webp?resize=1200%2C628&quality=82&strip=all&ssl=1",
+"publishedAt": "2025-01-24T19:14:18Z",
+"content": "Closing out this week’s Green Deals is Tenways’ Valentine’s Day sale, which is taking up to $500 off its e-bikes with an additional $200 in savings taken off the order for two models together – and t… [+13612 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "DW (English)"
+},
+"author": "Deutsche Welle",
+"title": "German police investigate Musk salute projected on Tesla factory",
+"description": "The British campaign group \"Led By Donkeys\" has claimed responsibility for the stunt that authorities say may have breached German laws on the use of symbols linked to illegal organizations.",
+"url": "https://www.dw.com/en/german-police-investigate-musk-salute-projected-on-tesla-factory/a-71403737",
+"urlToImage": "https://static.dw.com/image/71382138_6.jpg",
+"publishedAt": "2025-01-24T19:11:00Z",
+"content": "German authorities are investigating images projected onto the Tesla Gigafactory just outside Berlin that depicted Elon Musk apparently performing a Nazi-style salute at US President Donald Trump's r… [+4161 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Electrek"
+},
+"author": "Fred Lambert",
+"title": "Tesla has a new self-driving computer retrofit, but it’s not even for HW3 cars",
+"description": "According to a well-known Tesla hacker, Tesla has designed a new self-driving computer retrofit, but it’s not even for HW3 cars.\n\n\n\n more…",
+"url": "http://electrek.co/2025/01/24/tesla-has-a-new-self-driving-computer-retrofit-but-its-not-even-for-hw3-cars/",
+"urlToImage": "https://i0.wp.com/electrek.co/wp-content/uploads/sites/3/2025/01/Tesla-Model-Y-reloaded-self-driving-computer.jpg?resize=1200%2C628&quality=82&strip=all&ssl=1",
+"publishedAt": "2025-01-24T19:10:24Z",
+"content": "Screenshot\r\nAccording to a well-known Tesla hacker, Tesla has designed a new self-driving computer retrofit, but it’s not even for HW3 cars.\r\nTeska has two primary computational hardware generations … [+3092 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Nextgov"
+},
+"author": "Natalie Alms",
+"title": "GSA announces new FAS, TTS leadership",
+"description": "The new leaders are interested in working with Elon Musk’s DOGE.",
+"url": "https://www.nextgov.com/people/2025/01/gsa-announces-new-fas-tts-leadership/402485/",
+"urlToImage": "https://cdn.nextgov.com/media/img/cd/2025/01/24/012425GSANG/open-graph.jpg",
+"publishedAt": "2025-01-24T18:57:00Z",
+"content": "Silicon Valley and Tesla alum Thomas Shedd is the newest leader of the Technology Transformation Services at the General Services Administration, the agency announced on Friday.\r\nTTS charged with cre… [+3142 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "pymnts.com"
+},
+"author": "PYMNTS",
+"title": "This Week in AI: Trump Repeals Biden AI Rules but Launches Stargate",
+"description": "As expected, President Donal Trump this week signed an executive order rolling back former President Joe Biden’s 2023 artificial intelligence (AI) rules, which had been the country’s most comprehensive set of policies overseeing its advances. Biden ordered th…",
+"url": "https://www.pymnts.com/artificial-intelligence-2/2025/this-week-in-ai-trump-repeals-biden-ai-rules-but-launches-stargate/",
+"urlToImage": "https://www.pymnts.com/wp-content/uploads/2025/01/Trump-AI-regulations-Stargate-data-centers.jpg",
+"publishedAt": "2025-01-24T18:29:20Z",
+"content": "As expected, President Donal Trump this week signed an executive order rolling back former President Joe Bidens 2023 artificial intelligence (AI) rules, which had been the countrys most comprehensive… [+5966 chars]"
+},
+-{
+-"source": {
+"id": "time",
+"name": "Time"
+},
+"author": "Rebecca Schneid",
+"title": "Who Might Buy TikTok? From MrBeast to Elon Musk, Here Are the Top Contenders",
+"description": "From MrBeast to Elon Musk, various high-profile names have been identified as potential buyers.",
+"url": "https://time.com/7209861/who-will-buy-tiktok-meet-contenders-mrbeast-elon-musk-billionaires/",
+"urlToImage": "https://api.time.com/wp-content/uploads/2025/01/GettyImages-2176985676-1.jpg?quality=85&w=1200&h=628&crop=1",
+"publishedAt": "2025-01-24T18:19:27Z",
+"content": "On the eve of Saturday, Jan. 18, TikTok went dark in the U.S. in response to a federal ban, after the U.S. government raised concerns about the apps China-based owner ByteDance and the access it migh… [+6482 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Biztoc.com"
+},
+"author": "barrons.com",
+"title": "Stock Market Today: Dow Down; Trump Tariff Talk; Nvidia, Tesla, Verizon, Novo, More Movers",
+"description": "LIVE UPDATES\nStock Market News: Dow Slips as the Market Digests Trump Tariff Talk\nThe S&P 500 and Nasdaq are also edging lower.\nLast Updated:\nJan. 24, 2025 at 12:52 PM EST\nKey Events\nPinned Post\nStocks ticked lower from their opening levels after a raft of ec…",
+"url": "https://biztoc.com/x/879a90b49417621f",
+"urlToImage": "https://biztoc.com/cdn/808/og.png",
+"publishedAt": "2025-01-24T18:18:57Z",
+"content": "LIVE UPDATESStock Market News: Dow Slips as the Market Digests Trump Tariff TalkThe S&amp;P 500 and Nasdaq are also edging lower.Last Updated:Jan. 24, 2025 at 12:52 PM ESTKey EventsPinned PostStocks … [+143 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Biztoc.com"
+},
+"author": "latimes.com",
+"title": "With an executive order, Trump casts doubt on the future of EVs in California",
+"description": "With an executive order, Trump casts doubt on the future of EVs in California\nShel Singh has gone all-in on electric vehicles in recent years. The 36-year-old business owner currently drives an electric Porsche. Before that, it was a Tesla.\nBut with President…",
+"url": "https://biztoc.com/x/b4164c0418a6c3f4",
+"urlToImage": "https://biztoc.com/cdn/b4164c0418a6c3f4_s.webp",
+"publishedAt": "2025-01-24T18:18:33Z",
+"content": "With an executive order, Trump casts doubt on the future of EVs in CaliforniaShel Singh has gone all-in on electric vehicles in recent years. The 36-year-old business owner currently drives an electr… [+142 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Slashdot.org"
+},
+"author": "feedfeeder",
+"title": "Stock Market Today: Dow Down; Trump Tariff Talk; Nvidia, Tesla, Verizon, Novo, More Movers - Barron's",
+"description": "Stock Market Today: Dow Down; Trump Tariff Talk; Nvidia, Tesla, Verizon, Novo, More MoversBarron's Stock market today: Dow, S&P 500, Nasdaq stall as investors weigh earnings, Trump on ChinaYahoo Finance Wall St muted as investors assess economic data; Boeing …",
+"url": "https://slashdot.org/firehose.pl?op=view&amp;id=176034411",
+"urlToImage": null,
+"publishedAt": "2025-01-24T18:14:38Z",
+"content": "The Fine Print: The following comments are owned by whoever posted them. We are not responsible for them in any way."
+},
+-{
+-"source": {
+"id": null,
+"name": "HackRead"
+},
+"author": "Waqas",
+"title": "US Charges Five in North Korean IT Worker Hiring Scam",
+"description": "US prosecutors charged five, including North Koreans, for tricking firms into hiring fake IT workers, sending $866K+ to…",
+"url": "https://hackread.com/us-charges-north-korean-it-worker-hiring-scam/",
+"urlToImage": "https://hackread.com/wp-content/uploads/2025/01/us-charges-north-korean-it-worker-hiring-scam-2.jpg",
+"publishedAt": "2025-01-24T18:13:07Z",
+"content": "US prosecutors charged five, including North Koreans, for tricking firms into hiring fake IT workers, sending $866K+ to fund weapons programs. Stay alert, and report fraud.\r\nFederal prosecutors in th… [+3480 chars]"
+},
+-{
+-"source": {
+"id": "newsweek",
+"name": "Newsweek"
+},
+"author": "Shannon McDonagh",
+"title": "Poll: Americans Skeptical of Musk Leading Trump's Efficiency Drive",
+"description": "Only 3 in 10 Americans approve of the new Department of Government Efficiency (DOGE), led by Elon Musk.",
+"url": "https://www.newsweek.com/poll-elon-musk-trump-doge-efficiency-support-2020326",
+"urlToImage": "https://d.newsweek.com/en/full/2572988/poll-questions-elon-musk-doge.jpg",
+"publishedAt": "2025-01-24T18:03:22Z",
+"content": "A new poll suggests Americans are split on overhauling the federal government with Elon Musk's Department of Government Efficiency (DOGE).\r\nResearch by the AP-NORC Center for Public Affairs Research … [+5485 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Rolling Stone"
+},
+"author": "Miles Klee",
+"title": "Anti-Vax Conspiracy Theorists Freak Out Over Trump’s $500 Billion AI Plan",
+"description": "President Trump's $500 billion Stargate Initiative to build AI infrastructure faces blowback from his conspiracist supporters.",
+"url": "http://www.rollingstone.com/culture/culture-news/conspiracy-theory-anti-vax-ai-infrastructure-trump-1235245054/",
+"urlToImage": "https://www.rollingstone.com/wp-content/uploads/2025/01/larry-ellison-anti-vax-conspiracy-theorists-trump-ai.jpg?w=1600&h=900&crop=1",
+"publishedAt": "2025-01-24T18:03:07Z",
+"content": "President Donald Trump has said he wants the United States to be “the world capital of artificial intelligence and crypto.” On the latter front, he has so far launched and profited from his own meme … [+6507 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "The Daily Caller"
+},
+"author": "Phillip Bell",
+"title": "PHILLIP BELL: There’s One Merger Trump’s FTC Shouldn’t Hesitate To Approve",
+"description": "The United States has long been the “Land of Opportunity.”",
+"url": "https://dailycaller.com/2025/01/24/opinion-theres-one-merger-trumps-ftc-shouldnt-hesitate-to-approve-phillip-bell/",
+"urlToImage": "https://cdn01.dailycaller.com/wp-content/uploads/2025/01/GettyImages-2184801587-e1737740791189.jpg",
+"publishedAt": "2025-01-24T17:54:56Z",
+"content": "The United States has long been the “Land of Opportunity.” That has been true since our founding and remained through different epochs of political change and social turmoil.\r\nDuring the past few yea… [+6556 chars]"
+},
+-{
+-"source": {
+"id": "business-insider",
+"name": "Business Insider"
+},
+"author": "Sarah Perkel",
+"title": "Uber CEO addresses the elephant in the room: What happens to human Uber drivers once robotaxis arrive?",
+"description": "Uber's CEO said \"humans are going to have plenty of work\" for the next 10 years with autonomous vehicles \"feathering in\" to the company's fleet.",
+"url": "https://www.businessinsider.com/uber-ceo-self-driving-cars-robotaxis-human-drivers-impact-2025-1",
+"urlToImage": "https://i.insider.com/67928aff2fcded5e90748084?width=1200&format=jpeg",
+"publishedAt": "2025-01-24T17:54:06Z",
+"content": "Uber CEO Dara Khosrowshahi said AVs will be integrated alongside its fleet of human drivers for the foreseeable future.World Economic Forum / Sandra Blaser\r\n<ul><li>CEO Dara Khosrowshahi said he expe… [+3821 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Fark.com"
+},
+"author": null,
+"title": "Tesla sales were already siding in Europe well before Musk's did not see that coming salute [Dumbass]",
+"description": "Tesla sales were already siding in Europe well before Musk's did not see that coming salute",
+"url": "https://www.fark.com/comments/13536562/Tesla-sales-were-already-siding-in-Europe-well-before-Musks-did-not-see-that-coming-salute",
+"urlToImage": "https://usrimg-full.fark.net/n/nG/fark_nGBnLcMldmB1CSx6uu6AvFEvS1c.jpg?AWSAccessKeyId=JO3ELGV4BGLFW7Y3EZXN&Expires=1737954000&Signature=TpRw0UIBsbid6jleiVs4jQtt24c%3D",
+"publishedAt": "2025-01-24T17:50:08Z",
+"content": "OdradekRex:It's time for his company boards to kick him out.  They'll put up with his crap while the stock makes money, but as soon as it starts a good slide, they'll dump him.  The threat of litigat… [+400 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Windows Central"
+},
+"author": "kevinokemwa@outlook.com (Kevin Okemwa)",
+"title": "OpenAI's for-profit evolution hits a major roadblock — as the ChatGPT maker struggles to establish Microsoft's equity in its reportedly $30 billion charitable arm",
+"description": "OpenAI is reportedly deliberating transforming into a for-profit entity. However, the process has seemingly been stunted as the ChatGPT maker struggles to determine Microsoft's equity in the public benefit corporation, which could be valued at $30 billion.",
+"url": "https://www.windowscentral.com/software-apps/openais-for-profit-evolution-hits-a-major-roadblock",
+"urlToImage": "https://cdn.mos.cms.futurecdn.net/WscjnqGnqJgjmiiQqaKxfM-1200-80.jpg",
+"publishedAt": "2025-01-24T17:49:52Z",
+"content": "Last year, OpenAI was on the verge of bankruptcy, with projections of making a $5 billion loss within 12 months. However, key investors, including SoftBank, Microsoft, and NVIDIA, raised $6.6 billion… [+2570 chars]"
+},
+-{
+-"source": {
+"id": "nbc-news",
+"name": "NBC News"
+},
+"author": "Bruna Horvath",
+"title": "$60 billion in one year: Zuckerberg touts Meta's AI investments",
+"description": "Meta CEO Mark Zuckerberg announced Friday that the company plans to build a massive data center in Louisiana to power its newest AI model, Llama 4, which is set to launch this year.",
+"url": "https://www.nbcnews.com/tech/tech-news/60-billion-one-year-zuckerberg-touts-metas-ai-investments-rcna189131",
+"urlToImage": "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2025-01/250114-Mark-Zuckerberg-ch-1357-1e597b.jpg",
+"publishedAt": "2025-01-24T17:43:23Z",
+"content": "Meta CEO Mark Zuckerberg announced Friday that the company plans to build a massive data center in Louisiana to power its newest AI model, Llama 4, which is set to launch this year.\r\nIn a Facebook po… [+2945 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "iPhone in Canada"
+},
+"author": "John Quintet",
+"title": "New 2025 Tesla Model Y Launches in Canada: Pricing and What’s New",
+"description": "Tesla has launched its new Model Y refresh (codenamed ‘Juniper’) in Canada and the United States. The late Thursday evening launch brings the new Model Y to Canada, while the existing Model Y is still available. The debut comes after recent price increases to…",
+"url": "https://www.iphoneincanada.ca/2025/01/24/new-tesla-model-y-launches-in-canada-pricing-and-whats-new/",
+"urlToImage": "https://cdn.iphoneincanada.ca/wp-content/uploads/2017/09/iic-logo-1.svg",
+"publishedAt": "2025-01-24T17:42:01Z",
+"content": "Tesla has launched its new Model Y refresh (codenamed Juniper) in Canada and the United States.\r\nThe late Thursday evening launch brings the new Model Y to Canada, while the existing Model Y is still… [+2813 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "SiliconANGLE News"
+},
+"author": "Robert Hof",
+"title": "AI spurs an explosion in data center spending. Can it all pay off?",
+"description": "TikTok returned early this week after a short pause thanks to newly minted President Trump, but it was his other executive orders on AI and crypto that are likely to roil the business world. Meanwhile, Trump’s memecoins and loosening of crypto rules provide a…",
+"url": "https://siliconangle.com/2025/01/24/ai-spurs-explosion-data-center-spending-can-pay-off/",
+"urlToImage": "https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2025/01/a-panoramic-view-of-a-vast-field-of-data-centers.jpeg",
+"publishedAt": "2025-01-24T17:38:07Z",
+"content": "TikTok returned early this week after a short pause thanks to newly minted President Trump, but it was his other executive orders on AI and crypto that are likely to roil the business world.\r\nMeanwhi… [+9758 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Slashdot.org"
+},
+"author": "msmash",
+"title": "Electric Cars in UK Last as Long as Petrol and Diesel Vehicles, Study Finds",
+"description": "Battery cars on Britain's roads are lasting as long as petrol and diesel cars, according to a study that has found a rapid improvement in electric vehicle reliability. From a report: An international team of researchers has estimated that an electric car will…",
+"url": "https://tech.slashdot.org/story/25/01/24/171242/electric-cars-in-uk-last-as-long-as-petrol-and-diesel-vehicles-study-finds",
+"urlToImage": "https://a.fsdn.com/sd/topics/transportation_64.png",
+"publishedAt": "2025-01-24T17:30:00Z",
+"content": "An international team of researchers has estimated that an electric car will have a lifespan of 18.4 years, compared with 18.7 years for petrol cars and 16.8 years for diesels, according to a peer-re… [+824 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Yale.edu"
+},
+"author": "news@yale.edu (Yale News)",
+"title": "Five Yalies selected as 2025-26 Schwarzman Scholars",
+"description": "Two Yale seniors and three recent graduates have received Schwarzman Scholarships, a prestigious program that supports graduate study in&nbsp;China.",
+"url": "https://news.yale.edu/2025/01/24/five-yalies-selected-2025-26-schwarzman-scholars",
+"urlToImage": "https://news.yale.edu/sites/default/files/styles/opengraph_image/public/2025-01/Five-2025-Schwarzman.jpg?h=fcf25457&itok=Q2ehoGJx",
+"publishedAt": "2025-01-24T17:28:56Z",
+"content": "Two Yale College seniors and three recent Yale graduates are among 150 scholars from around the world who have been selected as 2025-26 Schwarzman Scholars, which supports graduate study in China.\r\nY… [+5622 chars]"
+},
+-{
+-"source": {
+"id": "financial-post",
+"name": "Financial Post"
+},
+"author": "Bloomberg News",
+"title": "French Ministers Warn EU Car-Emissions Rules Enrich China, Musk",
+"description": "French ministers are calling for the European Commission to immediately suspend standards for car emissions on the grounds that the regulation benefits Chinese manufacturers and Tesla Inc.",
+"url": "https://financialpost.com/pmn/business-pmn/french-ministers-warn-eu-car-emissions-rules-enrich-china-musk",
+"urlToImage": null,
+"publishedAt": "2025-01-24T17:26:01Z",
+"content": "Implementing the regulation would be a political error that would damage the credibility of our Union and its industrial strategy, three ministers including minister of Europe Benjamin Haddad, indust… [+1437 chars]"
+},
+-{
+-"source": {
+"id": "the-times-of-india",
+"name": "The Times of India"
+},
+"author": "The Feed",
+"title": "Is Tesla's Cybertruck losing its mojo? Brand new inventories are being sold for huge discounts in the U.S.",
+"description": "Recent developments have revealed something surprising that Tesla CEO Elon Musk is offering its first discounts on Tesla Cybertruck which are pretty huge and thus speculations are going around that if Tesla Cybertruck is losing its mojo or not.",
+"url": "https://economictimes.indiatimes.com/news/international/us/is-teslas-cybertruck-losing-its-mojo-brand-new-inventories-are-being-sold-for-huge-discounts-in-the-u-s-/articleshow/117531075.cms",
+"urlToImage": "https://img.etimg.com/thumb/msid-117531074,width-1200,height-630,imgsize-174548,overlay-economictimes/articleshow.jpg",
+"publishedAt": "2025-01-24T17:18:44Z",
+"content": "Artificial Intelligence(AI)\r\nAI and Analytics based Business Strategy\r\nBy - Tanusree De, Managing Director- Accenture Technology Lead, Trustworthy AI Center of Excellence: ATCI\r\nView Program"
+},
+-{
+-"source": {
+"id": null,
+"name": "Jalopnik"
+},
+"author": "Collin Woodard",
+"title": "Startup Everybody Assumed Was Already Dead After CEO Jailed Now In Danger Of Bankruptcy",
+"description": "For more than a decade, trucking startup Nikola has been trying to break into the long-haul trucking space with next-generation trucks that promise to save operators some big money. What exactly powers these trucks has changed over the years, but they’re defi…",
+"url": "https://jalopnik.com/startup-everybody-assumed-was-already-dead-after-ceo-ja-1851747106",
+"urlToImage": "https://i.kinja-img.com/image/upload/c_fill,h_675,pg_1,q_80,w_1200/6a2808a43b9bbd33421fba00dff54244.jpg",
+"publishedAt": "2025-01-24T16:45:00Z",
+"content": "For more than a decade, trucking startup Nikola has been trying to break into the long-haul trucking space with next-generation trucks that promise to save operators some big money. What exactly powe… [+2870 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Biztoc.com"
+},
+"author": "247wallst.com",
+"title": "Could Tesla Stock Drop 24% After Jan. 29?",
+"description": "Tesla (NASDAQ:TSLA) is a resurrected stock. While shares have nearly doubled over the past year, it was only after the presidential election that the stock took off, gaining more than 64%. Because of CEO Elon Musk’s close association with President Trump, inv…",
+"url": "https://biztoc.com/x/8f231216b363f3ed",
+"urlToImage": "https://biztoc.com/cdn/808/og.png",
+"publishedAt": "2025-01-24T16:39:12Z",
+"content": "Tesla (NASDAQ:TSLA) is a resurrected stock. While shares have nearly doubled over the past year, it was only after the presidential election that the stock took off, gaining more than 64%. Because of… [+146 chars]"
+},
+-{
+-"source": {
+"id": "marca",
+"name": "Marca"
+},
+"author": "marca.com",
+"title": "Weatherwoman who accused Erin Andrews of making up weather report for a game is fired from her job",
+"description": "Sam Kuffel, a meteorologist for CBS Milwaukee affiliate CBS 58, recently made headlines after publicly criticizing sports broadcaster Erin Andrews for allegedly fabricating a weath",
+"url": "https://www.marca.com/en/nfl/2025/01/24/6793b65eca4741a06b8b458e.html",
+"urlToImage": "https://phantom-marca.unidadeditorial.es/ca98802ae1cdd80bdc280b7d75ab09d8/crop/0x0/1975x1317/resize/1200/f/webp/assets/multimedia/imagenes/2025/01/24/17377333705432.jpg",
+"publishedAt": "2025-01-24T16:32:51Z",
+"content": "Sam Kuffel, a meteorologist for CBS Milwaukee affiliate CBS 58, recently made headlines after publicly criticizing sports broadcaster Erin Andrews for allegedly fabricating a weather report during aP… [+2613 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Biztoc.com"
+},
+"author": "politico.eu",
+"title": "Tesla also sues EU over electric vehicle duties",
+"description": "BRUSSELS — Elon Musk’s Tesla will face off with the European Commission in court in Luxembourg after joining three Chinese carmakers in suing the bloc over duties on made-in-China electric vehicles, two industry sources told POLITICO on Friday.\nTesla, despite…",
+"url": "https://biztoc.com/x/7369614da1cc5b46",
+"urlToImage": "https://biztoc.com/cdn/7369614da1cc5b46_s.webp",
+"publishedAt": "2025-01-24T16:27:59Z",
+"content": "BRUSSELS Elon Musks Tesla will face off with the European Commission in court in Luxembourg after joining three Chinese carmakers in suing the bloc over duties on made-in-China electric vehicles, two… [+147 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Biztoc.com"
+},
+"author": "investors.com",
+"title": "Meta Platforms, Tesla, Microsoft Headline Parade Of Magnificent Seven Earnings Reports",
+"description": "Fourth-quarter earnings season got off to a great start with strong reports in the financial sector from JPMorgan (JPM) and Goldman Sachs (GS). Netflix (NFLX) followed up with a solid earnings report of its own Tuesday. Now attention turns to Meta Platforms (…",
+"url": "https://biztoc.com/x/fdcb30c0cfd04003",
+"urlToImage": "https://biztoc.com/cdn/fdcb30c0cfd04003_s.webp",
+"publishedAt": "2025-01-24T16:27:56Z",
+"content": "Fourth-quarter earnings season got off to a great start with strong reports in the financial sector from JPMorgan (JPM) and Goldman Sachs (GS). Netflix (NFLX) followed up with a solid earnings report… [+142 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Biztoc.com"
+},
+"author": "aol.com",
+"title": "Tesla launches refreshed Model Y in bid to boost sales in US, globally",
+"description": "launched an updated version of the Model Y in the US and Europe late Thursday night, bringing some new excitement to its product portfolio, which had been getting long in the tooth.\nOn its website, Tesla said the “new Model Y,” featuring an updated exterior a…",
+"url": "https://biztoc.com/x/1250a7a98dcfb7a6",
+"urlToImage": "https://biztoc.com/cdn/1250a7a98dcfb7a6_s.webp",
+"publishedAt": "2025-01-24T16:06:36Z",
+"content": "launched an updated version of the Model Y in the US and Europe late Thursday night, bringing some new excitement to its product portfolio, which had been getting long in the tooth.On its website, Te… [+144 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Investor's Business Daily"
+},
+"author": null,
+"title": "Meta Platforms, Tesla, Microsoft Headline Parade Of Magnificent Seven Earnings Reports",
+"description": "Meta stock is holding near all-time highs ahead of a busy week of earnings among large-cap technology stocks.",
+"url": "https://www.investors.com/research/earnings-preview/meta-platforms-tesla-headline-magnificent-7-earnings-reports/",
+"urlToImage": "https://www.investors.com/wp-content/uploads/2024/02/Stock-Meta-build-shutt.jpg",
+"publishedAt": "2025-01-24T16:05:38Z",
+"content": "Information in Investors Business Daily is for informational and educational purposes only and should not be construed as an offer, recommendation, solicitation, or rating to buy or sell securities. … [+1064 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Biztoc.com"
+},
+"author": "engadget.com",
+"title": "Tesla's new Model Y arrives in the US",
+"description": "Tesla has officially launched the redesigned Model Y in North America and Europe, a couple of weeks after the vehicle was announced for the Asia Pacific region. The new version isn't replacing the original Model Y, though — at least not yet — and Tesla is sel…",
+"url": "https://biztoc.com/x/a0f7f8ea5b993f32",
+"urlToImage": "https://biztoc.com/cdn/808/og.png",
+"publishedAt": "2025-01-24T15:55:27Z",
+"content": "Tesla has officially launched the redesigned Model Y in North America and Europe, a couple of weeks after the vehicle was announced for the Asia Pacific region. The new version isn't replacing the or… [+145 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Biztoc.com"
+},
+"author": "investors.com",
+"title": "Stock Market Today: Verizon Shoots Higher, Leads Dow Jones; Software Giant Soars 20%, Here's Why (Live Coverage)",
+"description": "Stocks were narrowly mixed Friday morning, although the Dow Jones Industrial Average, S&P 500 and Nasdaq composite were still on pace for bullish weekly gains. Several top stocks outperformed on the stock market today, including Tesla (TSLA) ahead of next wee…",
+"url": "https://biztoc.com/x/16643a25521a17cd",
+"urlToImage": "https://biztoc.com/cdn/16643a25521a17cd_s.webp",
+"publishedAt": "2025-01-24T15:55:24Z",
+"content": "Stocks were narrowly mixed Friday morning, although the Dow Jones Industrial Average, S&amp;P 500 and Nasdaq composite were still on pace for bullish weekly gains. Several top stocks outperformed on … [+147 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Forbes"
+},
+"author": "Derek Saul, Forbes Staff, \n Derek Saul, Forbes Staff\n https://www.forbes.com/sites/dereksaul/",
+"title": "Meta Will Spend Record $60 Billion On AI This Year, Zuckerberg Says—After Trump Announces Stargate Deal With OpenAI",
+"description": "The $60 to $65 billion in projected capital expenditures this year is more than double the $27 billion Meta spent in 2023.",
+"url": "https://www.forbes.com/sites/dereksaul/2025/01/24/meta-will-spend-record-60-billion-on-ai-this-year-zuckerberg-says-after-trump-announces-stargate-deal-with-openai/",
+"urlToImage": "https://imageio.forbes.com/specials-images/imageserve/6793b717e878ac46472ba834/0x0.jpg?format=jpg&crop=2656,1495,x285,y208,safe&height=900&width=1600&fit=bounds",
+"publishedAt": "2025-01-24T15:54:04Z",
+"content": "Meta will rapidly ramp up its spending in 2025 as part of its artificial intelligence push, according to its centibillionaire CEO Mark Zuckerberg announced Friday, as the battle between Meta and its … [+3742 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "TheWrap"
+},
+"author": "Sean Burch",
+"title": "Meta Will Spend Up to $65 Billion to Fuel AI Expansion, Mark Zuckerberg Says",
+"description": "The Facebook and Instagram boss reveals plans to build a data center that is nearly as big as Manhattan to fuel its AI growth\nThe post Meta Will Spend Up to $65 Billion to Fuel AI Expansion, Mark Zuckerberg Says appeared first on TheWrap.",
+"url": "https://www.thewrap.com/meta-65-billion-ai-investment-mark-zuckerberg-facebook/",
+"urlToImage": "https://www.thewrap.com/wp-content/uploads/2024/10/ZUck.png",
+"publishedAt": "2025-01-24T15:47:14Z",
+"content": "Meta CEO Mark Zuckerberg on Friday said his company will spend $60-$65 billion this year as it looks to significantly expand its artificial intelligence team and services. The investment comes as Met… [+1750 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Daily Beast"
+},
+"author": "Leigh Kimmins",
+"title": "Joe Rogan Backs Elon Musk in Provocative Salute Debate",
+"description": "Podcaster Joe Rogan has weighed in on the debate around whether Elon Musk did a Nazi salute, unsurprisingly coming out fighting for the tech mogul and...",
+"url": "https://www.thedailybeast.com/joe-rogan-backs-elon-musk-in-nazi-salute-debate-and-rails-against-a-hole-liberals/",
+"urlToImage": "https://s.yimg.com/ny/api/res/1.2/wQFDHYlqovY9W7MVNvZEbg--/YXBwaWQ9aGlnaGxhbmRlcjt3PTEyMDA7aD02NzU-/https://media.zenfs.com/en/thedailybeast.com/2066df6ab5a0d8e94054ae152ae5675d",
+"publishedAt": "2025-01-24T15:45:52Z",
+"content": "Podcaster Joe Rogan has weighed in on the debate around whether Elon Musk did a Nazi salute, unsurprisingly coming out fighting for the tech mogul and calling his detractors a--holes.\r\nRogan, who rec… [+2471 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Biztoc.com"
+},
+"author": "barchart.com",
+"title": "Does Elon Musk Have a Game Plan for Tesla Stock? 5 Things to Watch Ahead of TSLA’s Q4 Earnings",
+"description": "Less than $10/month! Get more Watchlists, Portfolios, Custom Views and Chart Templates with Barchart Plus.\nFREE 30 Day Trial\n- Market Pulse\n-\n- Options Market Overview\n- Unusual Options Activity\n- IV Rank and IV Percentile\n- Implied vs Realized Vol\n- Most Act…",
+"url": "https://biztoc.com/x/2589a98291806c0a",
+"urlToImage": "https://biztoc.com/cdn/2589a98291806c0a_s.webp",
+"publishedAt": "2025-01-24T15:44:27Z",
+"content": "Less than $10/month! Get more Watchlists, Portfolios, Custom Views and Chart Templates with Barchart Plus.FREE 30 Day Trial- Market Pulse-- Options Market Overview- Unusual Options Activity- IV Rank … [+135 chars]"
+},
+-{
+-"source": {
+"id": "newsweek",
+"name": "Newsweek"
+},
+"author": "Khaleda Rahman",
+"title": "Elon Musk's DOGE Plan Is in Turmoil",
+"description": "In an executive order, President Donald Trump laid out a narrower goal for DOGE than what Musk has touted.",
+"url": "https://www.newsweek.com/elon-musk-doge-plan-turmoil-2020305",
+"urlToImage": "https://d.newsweek.com/en/full/2572711/elon-musk-arrives-inauguration.jpg",
+"publishedAt": "2025-01-24T15:40:48Z",
+"content": "Elon Musk's plan for the new Department of Government Efficiency (DOGE) may be in disarray following a number of changes to the initiative in recent days.\r\nBill McGinley, who was appointed DOGE's leg… [+3670 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "TheStranger.com"
+},
+"author": "Nathalie Graham",
+"title": "Slog AM: Seattle Judge Blocks Trump's Birthright Order, Trump Pardons Anti-Abortion Protesters, Don't Forget about Bird Flu",
+"description": "The Stranger's morning news roundup.\n \n by Nathalie Graham\n \n \n \n Boeing's big, bad billion-dollar losses: In a surprise to nobody, Boeing had a not-so-good year last year. In 2024, the aerospace company lost a cool $11.8 billion. The good news is that it's o…",
+"url": "https://www.thestranger.com/slog-am/2025/01/24/79888437/slog-am-seattle-judge-blocks-trumps-birthright-order-trump-pardons-anti-abortion-protesters-dont-forget-about-bird-flu",
+"urlToImage": "https://media2.fdncms.com/stranger/imager/u/large/79888544/gettyimages-2194990747.webp",
+"publishedAt": "2025-01-24T15:40:00Z",
+"content": "Boeing's big, bad billion-dollar losses: In a surprise to nobody, Boeing had a not-so-good year last year. In 2024, the aerospace company lost a cool $11.8 billion. The good news is that it's only th… [+7739 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Whyevolutionistrue.com"
+},
+"author": "whyevolutionistrue",
+"title": "Helen Pluckrose on Elon Musk and the faux Hitler Salute",
+"description": "I was quite surprised three days ago when I argued that Elon Musk’s “Hitler salute”  at the post-Inaugural rally simply seemed to be a gesture of exuberance made by an overexcited and awkward man and was not a Hitler or Mussolini salute. He said, when he made…",
+"url": "https://whyevolutionistrue.com/2025/01/24/helen-pluckrose-on-elon-musk-and-the-hitler-salute/",
+"urlToImage": "https://whyevolutionistrue.com/wp-content/uploads/2025/01/Screen-Shot-2025-01-22-at-5.07.44-PM.png",
+"publishedAt": "2025-01-24T15:30:42Z",
+"content": "I was quite surprised three days ago when I argued that Elon Musk’s “Hitler salute”  at the post-Inaugural rally simply seemed to be a gesture of exuberance made by an overexcited and awkward man and… [+9963 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Investor's Business Daily"
+},
+"author": "REINHARDT KRAUSE, Investor's Business Daily",
+"title": "Verizon Earnings Top Estimates; 2025 Revenue Outlook Meets Views",
+"description": "Verizon earnings and revenue edged by Q4 views, while wireless adds easily beat.",
+"url": "https://www.investors.com/news/technology/verizon-stock-verizon-earnings-vz-stock-q42025/",
+"urlToImage": "https://www.investors.com/wp-content/uploads/2018/10/Stock-verizon-09-shut.jpg",
+"publishedAt": "2025-01-24T15:30:01Z",
+"content": "Verizon Communications (VZ) on Friday reported fourth-quarter adjusted earnings and revenue that edged by Wall Street targets. In 2025, the Dow Jones telecom giant said it expects wireless service re… [+2628 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Electrek"
+},
+"author": "Peter Johnson",
+"title": "Rivian (RIVN) has several automakers ‘knocking on our door’ for EV tech",
+"description": "Rivian (RIVN) already has several automakers reaching out about potential supply deals for software and other EV tech. According to Rivian’s Chief Software Officer, Wassym Bensaid, its new partnership with Volkswagen has other OEMs “knocking on our door.”\n\n\n\n…",
+"url": "http://electrek.co/2025/01/24/rivian-rivn-says-several-rivals-knocking-on-our-door-for-ev-tech/",
+"urlToImage": "https://i0.wp.com/electrek.co/wp-content/uploads/sites/3/2025/01/Rivian-EV-tech-deal-1.jpeg?resize=1200%2C628&quality=82&strip=all&ssl=1",
+"publishedAt": "2025-01-24T15:20:32Z",
+"content": "Rivian (RIVN) already has several automakers reaching out about potential supply deals for software and other EV tech. According to Rivian’s Chief Software Officer, Wassym Bensaid, its new partnershi… [+3202 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "seattlepi.com"
+},
+"author": "By ALEXA ST. JOHN, Associated Press",
+"title": "'We've got to move forward' - Michigan electric vehicle industry responds to Trump policy changes",
+"description": "President Trump has slashed a slew of EV-related policies, which could affect many states that have received billions of dollars in investment for electrification, notably Michigan. But many Michigan EV industry stakeholders are optimistic.",
+"url": "https://www.seattlepi.com/news/politics/article/we-ve-got-to-move-forward-michigan-electric-20053625.php",
+"urlToImage": "https://s.hdnux.com/photos/01/46/62/35/26945374/3/rawImage.jpg",
+"publishedAt": "2025-01-24T15:12:38Z",
+"content": "FILE - A motorist charges his electric vehicle at a Tesla Supercharger station in Detroit, Nov. 16, 2022.Paul Sancya/AP\r\nFILE - President Donald Trump talks about the Endurance electric pickup truck … [+6248 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "New York Post"
+},
+"author": "Ariel Zilber",
+"title": "Trump aides ‘furious’ with Elon Musk for trashing $500B AI project: ‘He gives zero f–ks’",
+"description": "Musk reportedly angered Trump aides when he spoke up in response to the president's rollout of Stargate.",
+"url": "https://nypost.com/2025/01/24/business/trump-aides-furious-with-elon-musk-for-trashing-500b-ai-project/",
+"urlToImage": "https://nypost.com/wp-content/uploads/sites/2/2025/01/97243159.jpg?quality=75&strip=all&w=1024",
+"publishedAt": "2025-01-24T15:10:44Z",
+"content": "Elon Musk “very much” overstepped his bounds when he criticized a $500 billion artificial intelligence project touted by President Donald Trump, according to a White House official as aides are repor… [+5415 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Globalresearch.ca"
+},
+"author": "Peter Koenig",
+"title": "Does President Trump Support the Production of Killer mRNA Vaxxes?",
+"description": "According to Children’s Health Defense (CHD) or The Defender, the organization founded by Robert F. Kennedy Jr. who is nominated to become Secretary of Health under the new Trump Administration, the Biden Administration on Biden’s last day in office …\nThe pos…",
+"url": "https://www.globalresearch.ca/trump-production-killer-mrna-vaxxes/5878113",
+"urlToImage": "https://www.globalresearch.ca/wp-content/uploads/2025/01/trump-inaugural-portrait-791x1024.jpeg",
+"publishedAt": "2025-01-24T15:07:34Z",
+"content": "According to Childrens Health Defense (CHD) or The Defender, the organization founded by Robert F. Kennedy Jr. who is nominated to become Secretary of Health under the new Trump Administration, the B… [+10179 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "TechSpot"
+},
+"author": "Kishalaya Kundu",
+"title": "Tesla Model Y refresh arrives to the US in March, with a massive price hike",
+"description": "The long-range all-wheel drive variant of the new Model Y has a starting price of $59,990, a whopping 25 percent higher than the $47,990 asking price of the existing model with equivalent trim. However, for the additional money, the new model will include Tes…",
+"url": "https://www.techspot.com/news/106488-revamped-tesla-model-y-coming-us-march-massive.html",
+"urlToImage": "https://www.techspot.com/images2/news/bigimage/2025/01/2025-01-24-image-17.jpg",
+"publishedAt": "2025-01-24T15:05:00Z",
+"content": "Something to look forward to: Tesla announced a new-look SUV, codenamed 'Juniper,' earlier this month. It is a revamped Model Y that was initially only confirmed for the Chinese and select Asian mark… [+2432 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Thepinknews.com"
+},
+"author": "Hilary Mitchell",
+"title": "Campaign group Led By Donkeys pulls absolutely no punches with epic public takedown of Elon Musk",
+"description": "Elon Musk’s Berlin-based Tesla gigafactory has been repurposed as a giant screen by British political campaign group Led By Donkeys in partnership with by Germany’s Centre for Political Beauty. The groups projected a five-minute protest video about the billio…",
+"url": "https://www.thepinknews.com/2025/01/24/elon-musk-led-by-donkeys-tesla/",
+"urlToImage": "https://www.thepinknews.com/wp-content/uploads/2025/01/tesla-1462600x1300-1.jpeg",
+"publishedAt": "2025-01-24T15:02:56Z",
+"content": "Elon Musk’s Berlin-based Tesla gigafactory has been repurposed as a giant screen by British political campaign group Led By Donkeys in partnership with by Germanys Centre for Political Beauty.\r\nThe g… [+2483 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "GlobeNewswire"
+},
+"author": "Themes ETF Trust",
+"title": "Leveraged Shares by Themes launches AMDG, a 2X long ETF for Advanced Micro Devices (AMD); Expands leveraged offerings to six ETFs",
+"description": "Key Features of AMDG:  Seeks to provide 2X Long Exposure: Provides 200% daily targeted exposure to AMD.Low Management Fee: Just 0.75%, making it one of...",
+"url": "https://www.globenewswire.com/news-release/2025/01/24/3014959/0/en/Leveraged-Shares-by-Themes-launches-AMDG-a-2X-long-ETF-for-Advanced-Micro-Devices-AMD-Expands-leveraged-offerings-to-six-ETFs.html",
+"urlToImage": "https://ml.globenewswire.com/Resource/Download/7f6175f1-701a-4987-a050-ceaeb28f5686",
+"publishedAt": "2025-01-24T15:00:00Z",
+"content": "Key Features of AMDG:\r\n<ul><li>Seeks to provide 2X Long Exposure: Provides 200% daily targeted exposure to AMD.</li><li>Low Management Fee: Just 0.75%, making it one of the most cost-effective levera… [+5857 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Rogerebert.com"
+},
+"author": "Matt Zoller Seitz",
+"title": "Out of the Ashes: Let the 2025 Oscars Be a Telethon for Wildfire Relief",
+"description": "In the wake of the California wildfires, it's time for Hollywood to turn its biggest night into a chance to do good.",
+"url": "https://www.rogerebert.com/mzs/out-of-the-ashes-let-the-2025-oscars-be-a-telethon-for-wildfire-relief",
+"urlToImage": "https://www.rogerebert.com/wp-content/uploads/2025/01/Screenshot-2025-01-23-at-10.30.24 AM.png",
+"publishedAt": "2025-01-24T14:47:02Z",
+"content": "Can the 2025 Oscar broadcast double as a telethon to raise money for Southern Californias wildfire disaster? \r\nA number of people have floatedthatidea recently, and I think its a good one for a numbe… [+4713 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Quartz India"
+},
+"author": "William Gavin",
+"title": "Tesla's Model Y refresh is now for sale in the U.S.",
+"description": "Tesla (TSLA) has started selling its refreshed Model Y SUV, with deliveries planned for March, according to its website. Read more...",
+"url": "https://qz.com/tesla-model-y-juniper-ev-sales-tax-credit-musk-trump-1851747029",
+"urlToImage": "https://i.kinja-img.com/image/upload/c_fill,h_675,pg_1,q_80,w_1200/51a8342598d13a88f79739e8a75016e0.jpg",
+"publishedAt": "2025-01-24T14:46:00Z",
+"content": "In This Story\r\nTesla (TSLA+0.55%\r\n) has started selling its refreshed Model Y SUV, with deliveries planned for March, according to its website. \r\nThe Model Y Juniper will cost just shy of $60,000, ex… [+1625 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Jalopnik"
+},
+"author": "Logan Carter",
+"title": "This Extension Cord Finally Gives Non-Tesla EV Owners Safe, Hassle-Free Access To Superchargers",
+"description": "Despite the latest nauseating news about Tesla CEO and Nazi salute enthusiast Elon Musk,Tesla’sSupercharger network is still the most comprehensive charging network in the country and the connector is now the North American Charging Standard (NACS). Superchar…",
+"url": "https://jalopnik.com/this-extension-cord-finally-gives-non-tesla-ev-owners-s-1851746793",
+"urlToImage": "https://i.kinja-img.com/image/upload/c_fill,h_675,pg_1,q_80,w_1200/d22cc02961d652f3e31458a97773fee9.jpg",
+"publishedAt": "2025-01-24T14:45:00Z",
+"content": "Despite the latest nauseating news about Tesla CEO and Nazi salute enthusiast Elon Musk, Teslas Supercharger network is still the most comprehensive charging network in the country and the connector … [+3049 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Electrek"
+},
+"author": "Fred Lambert",
+"title": "Joe Rogan’s new custom Tesla Model S Plaid looks sick",
+"description": "Joe Rogan got himself a new Tesla Model S Plaid customized by Unplugged Performance, and I think it looks sick.\n\n\n\nDope or nope?\n\n\n\n more…",
+"url": "http://electrek.co/2025/01/24/joe-rogans-new-custom-tesla-model-s-plaid-looks-sick/",
+"urlToImage": "https://i0.wp.com/electrek.co/wp-content/uploads/sites/3/2025/01/Joe-Rogan-Tesla-Model-S-Plaid-UP-hero.png?resize=1200%2C628&quality=82&strip=all&ssl=1",
+"publishedAt": "2025-01-24T14:38:06Z",
+"content": "Joe Rogan got himself a new Tesla Model S Plaid customized by Unplugged Performance, and I think it looks sick.\r\nDope or nope?\r\nRogan was not always a fan of electric vehicles. In fact, at one point,… [+2791 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Biztoc.com"
+},
+"author": "asiafinancial.com",
+"title": "‘The End May Be In Sight’: Musk Pans Trump’s $500bn AI Deal",
+"description": "Tesla chief and US President Donald Trump’s current close aide Elon Musk has taken to X this week to criticise OpenAI, and its $500-billion artificial intelligence project that Trump announced with great fanfare at the White House on Tuesday.\nSam Altman-led O…",
+"url": "https://biztoc.com/x/48f82aea26d68ee1",
+"urlToImage": "https://biztoc.com/cdn/48f82aea26d68ee1_s.webp",
+"publishedAt": "2025-01-24T14:37:45Z",
+"content": "Tesla chief and US President Donald Trumps current close aide Elon Musk has taken to X this week to criticise OpenAI, and its $500-billion artificial intelligence project that Trump announced with gr… [+143 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Forbes"
+},
+"author": "JJ Kinahan, Senior Contributor, \n JJ Kinahan, Senior Contributor\n https://www.forbes.com/sites/jjkinahan/",
+"title": "Stocks Close At Record Highs Ahead Of Big Week Of Earnings",
+"description": "Overnight, Texas Instruments reported an earnings beat, but offered a disappointing outlook sending that stock lower by 4.5% in premarket trading.",
+"url": "https://www.forbes.com/sites/jjkinahan/2025/01/24/stocks-close-at-record-highs-ahead-of-big-week-of-earnings/",
+"urlToImage": "https://imageio.forbes.com/specials-images/imageserve/67939cc9299b6f9066725e12/0x0.jpg?format=jpg&height=900&width=1600&fit=bounds",
+"publishedAt": "2025-01-24T14:16:19Z",
+"content": "Shares of Apple have been under pressure ahead of next week's earnings report. (Photo by Justin ... [+] Sullivan/Getty Images)\r\nGetty Images\r\nKey Takeaways\r\n<ul><li>Dow Leads Gains As S&amp;P Hits Re… [+3672 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Biztoc.com"
+},
+"author": "247wallst.com",
+"title": "Tesla Raises Price of Model Y to $60,000",
+"description": "Tesla Inc. (NASDAQ: TSLA) is about to raise the price of its Model Y crossover to $59,990. It shows that the electric vehicle (EV) company still has some room for price increases on updated models, even in a difficult U.S. EV market.\n \n \n24/7 Wall St. Key Poi…",
+"url": "https://biztoc.com/x/3c8e9429c51397a6",
+"urlToImage": "https://biztoc.com/cdn/808/og.png",
+"publishedAt": "2025-01-24T14:16:16Z",
+"content": "Tesla Inc. (NASDAQ: TSLA) is about to raise the price of its Model Y crossover to $59,990. It shows that the electric vehicle (EV) company still has some room for price increases on updated models, e… [+132 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Biztoc.com"
+},
+"author": "euronews.com",
+"title": "Tesla unveils new premium model Y in Europe, the US and Canada",
+"description": "Tesla has revealed a new premium model Y version, first launched in China, which comes with a range of improved features.\nEV manufacturer Tesla launched a new version of its Model Y in Europe, the US and Canada on Thursday, after already having introduced it …",
+"url": "https://biztoc.com/x/3a0b36815138b058",
+"urlToImage": "https://biztoc.com/cdn/3a0b36815138b058_s.webp",
+"publishedAt": "2025-01-24T14:15:55Z",
+"content": "Tesla has revealed a new premium model Y version, first launched in China, which comes with a range of improved features.EV manufacturer Tesla launched a new version of its Model Y in Europe, the US … [+143 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Jalopnik"
+},
+"author": "Owen Bellwood",
+"title": "The Future Is ‘Going To Be Electric’ And There’s Nothing Donald Trump Can Do",
+"description": "Good morning! It’s Friday, January 24, 2025, and this is The Morning Shift, your daily roundup of the top automotive headlines from around the world, in one place. Here are the important stories you need to know.Read more...",
+"url": "https://jalopnik.com/the-future-is-going-to-be-electric-and-there-s-nothin-1851746889",
+"urlToImage": "https://i.kinja-img.com/image/upload/c_fill,h_675,pg_1,q_80,w_1200/439ef6b3ad2a752b92d8af445b78c81f.png",
+"publishedAt": "2025-01-24T14:05:00Z",
+"content": "Good morning! Its Friday, January 24, 2025, and this is The Morning Shift, your daily roundup of the top automotive headlines from around the world, in one place. Here are the important stories you n… [+9019 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Biztoc.com"
+},
+"author": "businessinsider.com",
+"title": "Tesla's updated Model Y is now available to order in the US and Europe",
+"description": "The new Tesla Model Y is now for sale in the US, UK, and Europe.\nTesla Hong Kong\nTesla's new updated Model Y is now available to order in the US, Canada, UK, and mainland Europe.\nThe refreshed Model Y was first launched in China earlier in January.\nTesla's sa…",
+"url": "https://biztoc.com/x/0167e6812a41177d",
+"urlToImage": "https://biztoc.com/cdn/808/og.png",
+"publishedAt": "2025-01-24T14:04:45Z",
+"content": "The new Tesla Model Y is now for sale in the US, UK, and Europe.Tesla Hong KongTesla's new updated Model Y is now available to order in the US, Canada, UK, and mainland Europe.The refreshed Model Y w… [+148 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Plos.org"
+},
+"author": "Richard W. Heidebrecht Jr., Thomas H. Jozefiak, Harrison C. Shain, Eugene M. Skrabut, Debra Saunders, Nataliya Smith, Rheal A. Towner, Robert Hurst",
+"title": "Development of a unique crosslinked glycosaminoglycan for soft tissue repair: Treatment of interstitial cystitis/bladder pain syndrome",
+"description": "Chemical modification of naturally derived glycosaminoglycans (GAGs) expands their potential utility for applications in soft tissue repair and regenerative medicine. Here we report the preparation of a novel crosslinked chondroitin sulfate (~200 to 2000 kilo…",
+"url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0317790",
+"urlToImage": "https://journals.plos.org/plosone/article/figure/image?id=10.1371/journal.pone.0317790.g004&size=inline",
+"publishedAt": "2025-01-24T14:00:00Z",
+"content": "Abstract\r\nChemical modification of naturally derived glycosaminoglycans (GAGs) expands their potential utility for applications in soft tissue repair and regenerative medicine. Here we report the pre… [+43228 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Wattsupwiththat.com"
+},
+"author": "Charles Rotter",
+"title": "How to Think about Climate Change",
+"description": "So, the takeaway message is that policies that slow CO2 emissions are based on flawed computer models which exaggerate warming by factors of two or three, probably more. That is message number one. So, why do we give up our freedoms, why do we give up our aut…",
+"url": "https://wattsupwiththat.com/2025/01/24/how-to-think-about-climate-change/",
+"urlToImage": "https://i0.wp.com/wattsupwiththat.com/wp-content/uploads/2025/01/151C4357-28DD-4A5B-AC47-707360BDEBEE_1_201_a-scaled-1.webp?fit=1024%2C512&ssl=1",
+"publishedAt": "2025-01-24T14:00:00Z",
+"content": "By William Happer\r\nThe best way to think about the frenzy over climate is to consider it a modern version of the medieval Crusades. You may remember that the motto of the crusaders was Deus vult!, Go… [+38204 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Rolling Stone"
+},
+"author": "Kate Storey",
+"title": "The Private Firefighters On Call for the Californians Who Can Afford Them",
+"description": "“I had people calling me, ‘If I write you a check right now for a million dollars, will you come to my house?’” says Andrew Sarvis of West Coast Water Tenders",
+"url": "http://www.rollingstone.com/culture/culture-features/los-angeles-fires-private-firefighters-1235238013/",
+"urlToImage": "https://www.rollingstone.com/wp-content/uploads/2025/01/private-firefighters-LEAD.jpg?w=1600&h=900&crop=1",
+"publishedAt": "2025-01-24T14:00:00Z",
+"content": "On Tuesday, January 7th, the first day of the Los Angeles Fires, Andrew Sarvis captained his nine firetrucks toward the homes in the Pacific Palisades, Malibu, and Brentwood. There was one bar of cel… [+17636 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Plos.org"
+},
+"author": "Patrick W. Stroman, Roland Staud, Caroline F. Pukall",
+"title": "Evidence of a persistent altered neural state in people with fibromyalgia syndrome during functional MRI studies and its relationship with pain and anxiety",
+"description": "Altered neural signaling in fibromyalgia syndrome (FM) was investigated with functional magnetic resonance imaging (fMRI). We employed a novel fMRI network analysis method, Structural and Physiological Modeling (SAPM), which provides more detailed information…",
+"url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0316672",
+"urlToImage": "https://journals.plos.org/plosone/article/figure/image?id=10.1371/journal.pone.0316672.g007&size=inline",
+"publishedAt": "2025-01-24T14:00:00Z",
+"content": "Citation: Stroman PW, Staud R, Pukall CF (2025) Evidence of a persistent altered neural state in people with fibromyalgia syndrome during functional MRI studies and its relationship with pain and anx… [+57011 chars]"
+},
+-{
+-"source": {
+"id": "business-insider",
+"name": "Business Insider"
+},
+"author": "nredmond@insider.com (Nora Redmond)",
+"title": "Tesla's updated Model Y is now available to order in the US and Europe",
+"description": "The launch of a refreshed version of Tesla's most-popular car comes as it fights its first ever decline in sales.",
+"url": "https://www.businessinsider.com/tesla-model-y-launched-in-us-canada-europe-2025-1",
+"urlToImage": "https://i.insider.com/67937df0ae09223df2bb58f0?width=1200&format=jpeg",
+"publishedAt": "2025-01-24T13:59:09Z",
+"content": "Tesla's updated version of the Model Y is now available to order in the US, Canada, the UK, and mainland Europe weeks after it was unveiled in China.\r\nIn the US, the refreshed car, including the full… [+2042 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Forbes"
+},
+"author": "Derek Saul, Forbes Staff, \n Derek Saul, Forbes Staff\n https://www.forbes.com/sites/dereksaul/",
+"title": "Sam Altman-Elon Musk Feud Timeline: AI Billionaires Bark Over Trump-Endorsed Stargate AI Project",
+"description": "Altman and Musk were OpenAI’s founding co-chairs in 2015, but their relationship has devolved into name-calling and lawsuits.",
+"url": "https://www.forbes.com/sites/dereksaul/2025/01/24/sam-altman-elon-musk-feud-timeline-ai-billionaires-bark-over-trump-endorsed-stargate-ai-project/",
+"urlToImage": "https://imageio.forbes.com/specials-images/imageserve/6792ab7d1060a91e611def61/0x0.jpg?format=jpg&crop=2676,1505,x211,y172,safe&height=900&width=1600&fit=bounds",
+"publishedAt": "2025-01-24T13:54:12Z",
+"content": "The dispute between arguably the two biggest names in generative artificial intelligencebillionaires Sam Altman and Elon Muskerupted this week after President Donald Trump announced a $500 billion St… [+5331 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Investing.com"
+},
+"author": "Investing.com",
+"title": "Tesla will report Q4 earnings next week: Morgan Stanley shares key insights",
+"description": "Tesla will report Q4 earnings next week: Morgan Stanley shares key insights",
+"url": "https://www.investing.com/news/stock-market-news/tesla-will-report-q4-earnings-next-week-morgan-stanley-shares-key-thoughts-3829812",
+"urlToImage": "https://i-invdn-com.investing.com/news/moved_LYNXMPEK920OU_L.jpg",
+"publishedAt": "2025-01-24T13:51:33Z",
+"content": "Investing.com -- Tesla (NASDAQ:TSLA) is due to report its fourth-quarter 2024 financial results on Jan. 29 after the market closing bell.\r\n Morgan Stanley (NYSE:MS) analysts believe buy-side expectat… [+2655 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Yahoo Entertainment"
+},
+"author": null,
+"title": "27-year-old San Francisco man's life cut short in deadly Tesla multi-car crash",
+"description": null,
+"url": "https://consent.yahoo.com/v2/collectConsent?sessionId=1_cc-session_70fe36e1-df9f-45e5-855b-2b7c06612d8f",
+"urlToImage": null,
+"publishedAt": "2025-01-24T13:40:24Z",
+"content": "If you click 'Accept all', we and our partners, including 239 who are part of the IAB Transparency &amp; Consent Framework, will also store and/or access information on a device (in other words, use … [+703 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Ibtimes.com.au"
+},
+"author": "Elodie Le Maou",
+"title": "Meta Guru Urges Europe To Gamble More On AI",
+"description": "Europe should take greater risks and plough more money into artificial intelligence, Meta's chief AI scientist Yann LeCun told AFP at the World Economic Forum.",
+"url": "https://www.ibtimes.com.au/meta-guru-urges-europe-gamble-more-ai-1855540",
+"urlToImage": "https://d.ibtimes.com.au/en/full/1872109/widely-viewed-one-godfathers-ai-metas-yann-lecun-said-europe-was-afriad-risk.jpg",
+"publishedAt": "2025-01-24T13:34:05Z",
+"content": "Europe should take greater risks and plough more money into artificial intelligence, Meta's chief AI scientist Yann LeCun told AFP at the World Economic Forum.\r\nWidely viewed as one of the \"godfather… [+2674 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "LADbible"
+},
+"author": "Olivia Burke",
+"title": "ADL slams Elon Musk's series of Nazi 'jokes' after defending his 'awkward' gesture during inauguration celebrations",
+"description": "The Anti Defamation League (ADL) have slammed Elon Musk for sharing Nazi jokes on X despite previously defending his alleged 'fascist' salute.",
+"url": "https://www.ladbible.com/news/us-news/elon-musk-nazi-jokes-anti-defamation-league-response-764767-20250124",
+"urlToImage": "https://images.ladbible.com/ogimage/v3/assets/bltcd74acc1d0a99f3a/blt66b5e9ccc4cc2e4a/67938b0c98c8432d76292810/elon-musk-nazi-jokes-x-adl-response.jpg",
+"publishedAt": "2025-01-24T13:20:11Z",
+"content": "The Anti Defamation League (ADL) has slammed Elon Musk after he made a series of Nazi 'jokes' on social media.\r\nJust days after defending the billionaire's controversial gesture at Donald Trump's ina… [+3129 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "blogTO"
+},
+"author": "Brad Bennett, MobileSyrup",
+"title": "Elon Musk is about to majorly hike prices on Tesla cars in Canada",
+"description": "Tesla is imposing some huge price hikes on its vehicles in the wake of the federal EV rebate and in the face of potential Trump tariffs.\r\nThe automakers have given no reason for the price hike, but the Model Y, X and S are all jumping up $4,000, and the Model…",
+"url": "https://www.blogto.com/tech/2025/01/elon-musk-hike-prices-tesla-cars-canada/",
+"urlToImage": "https://display.blogto.com/articles/20250124-tesla-canada.jpg?w=1200&cmd=resize_then_crop&height=630&quality=70",
+"publishedAt": "2025-01-24T13:18:45Z",
+"content": "Tesla is imposing some huge price hikes on its vehicles in the wake of the federal EV rebate and in the face of potential Trump tariffs.\r\nThe automakers have given no reason for the price hike, but t… [+839 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Wccftech"
+},
+"author": "Ramish Zafar",
+"title": "Elon Musk Believes Tesla Can Cross $4 Trillion Market Cap & Beat NVIDIA “By A Large Margin”",
+"description": "Tesla CEO Elon Musk believes his company can cross a $4 trillion valuation in the future. Tesla is one of the most valuable companies in the world, and its latest market value is $1.24 trillion. Data shows that the latest valuation makes the firm the eighth m…",
+"url": "https://wccftech.com/elon-musk-believes-tesla-can-cross-4-trillion-market-cap-beat-nvidia-by-a-large-margin/",
+"urlToImage": "https://cdn.wccftech.com/wp-content/uploads/2024/10/Tesla-1.jpg",
+"publishedAt": "2025-01-24T13:16:33Z",
+"content": "This is not investment advice. The author has no position in any of the stocks mentioned. Wccftech.com has a disclosure and ethics policy.\r\nTesla CEO Elon Musk believes his company can cross a $4 tri… [+2929 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "GlobeNewswire"
+},
+"author": "Worksport Ltd",
+"title": "Worksport Ltd. ($WKSP) Announces Global Patent Portfolio Growth, and Joins LOT Network for Enhanced Patent Protection",
+"description": "Strategic Alliance Aims to Lower Legal Costs & Strengthen Market Position, Ahead of Major Product Launches  West Seneca, New York, Jan.  24, 2025 ......",
+"url": "https://www.globenewswire.com/news-release/2025/01/24/3014874/0/en/Worksport-Ltd-WKSP-Announces-Global-Patent-Portfolio-Growth-and-Joins-LOT-Network-for-Enhanced-Patent-Protection.html",
+"urlToImage": "https://ml.globenewswire.com/Resource/Download/247ac396-a35f-4b80-abac-4ee93d603e63",
+"publishedAt": "2025-01-24T13:06:00Z",
+"content": "Strategic Alliance Aims to Lower Legal Costs &amp; Strengthen Market Position, Ahead of Major Product Launches\r\nWest Seneca, New York, Jan. 24, 2025 (GLOBE NEWSWIRE) -- Worksport Ltd. (NASDAQ: WKSP) … [+8814 chars]"
+},
+-{
+-"source": {
+"id": "newsweek",
+"name": "Newsweek"
+},
+"author": "James Bickerton",
+"title": "Netanyahu Defends Elon Musk over Nazi Salute: 'Falsely Smeared'",
+"description": "The tech billionaire visited Israel after the Hamas attack on October 7, 2023.",
+"url": "https://www.newsweek.com/netanyahu-defends-elon-musk-over-nazi-salute-falsely-smeared-2020208",
+"urlToImage": "https://d.newsweek.com/en/full/2572559/netanyahu-elon-musk.png",
+"publishedAt": "2025-01-24T13:04:32Z",
+"content": "Israeli Prime Minister Benjamin Netanyahu said Elon Musk is \"being falsely smeared\" after the tech billionaire was accused of giving two fascist salutes at Donald Trump's \"presidential parade\" on Mon… [+5209 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "BleepingComputer"
+},
+"author": "Sergiu Gatlan",
+"title": "Hackers get $886,250 for 49 zero-days at Pwn2Own Automotive 2025",
+"description": "​The Pwn2Own Automotive 2025 hacking contest has ended with security researchers collecting $886,250 after exploiting 49 zero-days. [...]",
+"url": "https://www.bleepingcomputer.com/news/security/hackers-get-886-250-for-49-zero-days-at-pwn2own-automotive-2025/",
+"urlToImage": "https://www.bleepstatic.com/content/hl-images/2024/01/24/Pwn2Own_Tokyo-headpic.jpg",
+"publishedAt": "2025-01-24T13:00:37Z",
+"content": "​The Pwn2Own Automotive 2025 hacking contest has ended with security researchers collecting $886,250 after exploiting 49 zero-days.\r\nThroughout the event, they targeted automotive software and produc… [+2066 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Windows Central"
+},
+"author": "kevinokemwa@outlook.com (Kevin Okemwa)",
+"title": "Microsoft CEO Satya Nadella weighs in on the $500 billion Stargate project, seemingly dismissing Elon Musk's liquidity concerns: “All I know is, I’m good for my $80 billion.”",
+"description": "Nadella says the company will continue investing in Azure despite OpenAI's recent $500 billion Stargate project to build infrastructure across the US.",
+"url": "https://www.windowscentral.com/microsoft/microsoft-ceo-satya-nadella-weighs-in-on-the-500-billion-stargate-project",
+"urlToImage": "https://cdn.mos.cms.futurecdn.net/9QH2xdbMLoXN3aKm66CEUe-1200-80.jpg",
+"publishedAt": "2025-01-24T13:00:00Z",
+"content": "OpenAI and SoftBank's \"Stargate\" took the world by storm after announcing the $500 billion project, which they are collaborating with Oracle and MGX. While making the announcement, the ChatGPT maker … [+3579 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Jewishnews.co.uk"
+},
+"author": "Michelle Rosenberg",
+"title": "Elon Musk makes Holocaust jokes after Netanyahu defends him as ‘great friend of Israel’",
+"description": "The ADL’s Jonathan Greenblatt blasted Musk’s Nazi jokes after remaining silent on his hand gesture\nThe post Elon Musk makes Holocaust jokes after Netanyahu defends him as ‘great friend of Israel’ appeared first on Jewish News.",
+"url": "https://www.jewishnews.co.uk/elon-musk-makes-holocaust-jokes-after-netanyahu-defends-him-as-great-friend-of-israel/",
+"urlToImage": "https://static.jewishnews.co.uk/jewishnews/uploads/2025/01/musk-tweets-2048x1138-1.jpg",
+"publishedAt": "2025-01-24T12:58:07Z",
+"content": "Israeli Prime Minister Benjamin Netanyahu has come to the defense of Elon Musk, days after the billionaire and prominent Trump ally was accused of delivering Nazi salutes at a presidential inaugurati… [+6508 chars]"
+},
+-{
+-"source": {
+"id": null,
+"name": "Biztoc.com"
+},
+"author": "businessinsider.com",
+"title": "Tesla sales in Europe are sliding. That's a problem for Elon Musk",
+"description": "Elon Musk played a key role in Donald Trump's election, and now he's turning his attention to Europe.\nANGELA WEISS / AFP via Getty Images\nNot content with shaking up US politics, Elon Musk is on a mission to \"make Europe great again.\"\nHis interventions into t…",
+"url": "https://biztoc.com/x/441fa06fe90e929b",
+"urlToImage": "https://biztoc.com/cdn/808/og.png",
+"publishedAt": "2025-01-24T12:47:22Z",
+"content": "Elon Musk played a key role in Donald Trump's election, and now he's turning his attention to Europe.ANGELA WEISS / AFP via Getty ImagesNot content with shaking up US politics, Elon Musk is on a miss… [+150 chars]"
 }
-{
-    "message": "User registered successfully."
+]
 }
-{
-    "email": "user@example.com",
-    "question": "What is artificial intelligence?"
-}
-{
-    "question": "What is artificial intelligence?",
-    "answer": "Artificial intelligence (AI) is the simulation of human intelligence in machines..."
-}
-{
-    "email": "user@example.com",
-    "subject": "Welcome to Premium!",
-    "body": "Thank you for joining our premium plan."
-}
-{
-    "message": "Email sent successfully."
-}
-
-

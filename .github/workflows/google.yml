@@ -1,57 +1,117 @@
-pip install flask google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client openai
-import os
 from flask import Flask, request, jsonify
-from googleapiclient.discovery import build
+from email_validator import validate_email, EmailNotValidError
 import openai
+import smtplib
 
 app = Flask(__name__)
 
-# Set your OpenAI API key
+# Set OpenAI API key
 openai.api_key = "your_openai_api_key_here"
 
-# Google Custom Search API settings
-GOOGLE_API_KEY = "your_google_api_key_here"
-GOOGLE_SEARCH_ENGINE_ID = "your_search_engine_id_here"
+# SMTP Settings for sending email (e.g., Gmail)
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
+SMTP_EMAIL = "your_email@gmail.com"
+SMTP_PASSWORD = "your_email_password"  # Use an App Password for Gmail
 
-def google_search(query, num_results=5):
-    """Search Google using the Custom Search API."""
-    service = build("customsearch", "v1", developerKey=GOOGLE_API_KEY)
-    results = service.cse().list(q=query, cx=GOOGLE_SEARCH_ENGINE_ID, num=num_results).execute()
-    return results.get('items', [])
+# Dummy storage for registered users
+users = {}
+
+@app.route('/register', methods=['POST'])
+def register():
+    """Register a user with email validation."""
+    data = request.json
+    email = data.get('email')
+
+    # Validate email
+    try:
+        valid = validate_email(email)
+        email = valid.email
+    except EmailNotValidError as e:
+        return jsonify({"error": str(e)}), 400
+
+    if email in users:
+        return jsonify({"message": "User already registered."}), 200
+
+    # Save user (dummy storage)
+    users[email] = {"is_premium": False}
+    return jsonify({"message": "User registered successfully."}), 201
+
 
 @app.route('/ask', methods=['POST'])
 def ask():
-    """Handles questions by searching Google and using GPT for processing."""
+    """Ask a question and trigger GPT response."""
     data = request.json
+    email = data.get('email')
     question = data.get('question')
 
-    if not question:
-        return jsonify({'error': 'No question provided.'}), 400
+    # Check if email is registered
+    if email not in users:
+        return jsonify({"error": "User not found. Please register first."}), 404
 
+    # Trigger GPT response
     try:
-        # Search Google for the question
-        google_results = google_search(question)
-
-        # Format the results for GPT
-        search_summary = "\n".join(
-            [f"{i+1}. {item['title']}: {item['link']}" for i, item in enumerate(google_results)]
-        )
-
-        # Use GPT to process and summarize the results
-        gpt_prompt = f"The user asked: {question}\n\nHere are the top Google results:\n{search_summary}\n\nProvide a concise, user-friendly answer based on this information:"
-        gpt_response = openai.Completion.create(
+        response = openai.Completion.create(
             engine="text-davinci-003",
-            prompt=gpt_prompt,
-            max_tokens=200
+            prompt=question,
+            max_tokens=150
         )
-
-        answer = gpt_response['choices'][0]['text'].strip()
-        return jsonify({'question': question, 'answer': answer, 'google_results': search_summary}), 200
-
+        answer = response['choices'][0]['text'].strip()
+        return jsonify({"question": question, "answer": answer}), 200
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/send-email', methods=['POST'])
+def send_email():
+    """Send email to a user."""
+    data = request.json
+    email = data.get('email')
+    subject = data.get('subject')
+    body = data.get('body')
+
+    # Check if email is registered
+    if email not in users:
+        return jsonify({"error": "User not found. Please register first."}), 404
+
+    # Send email using SMTP
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_EMAIL, SMTP_PASSWORD)
+            message = f"Subject: {subject}\n\n{body}"
+            server.sendmail(SMTP_EMAIL, email, message)
+
+        return jsonify({"message": "Email sent successfully."}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 python app.py
+{
+    "email": "user@example.com"
+}
+{
+    "message": "User registered successfully."
+}
+{
+    "email": "user@example.com",
+    "question": "What is artificial intelligence?"
+}
+{
+    "question": "What is artificial intelligence?",
+    "answer": "Artificial intelligence (AI) is the simulation of human intelligence in machines..."
+}
+{
+    "email": "user@example.com",
+    "subject": "Welcome to Premium!",
+    "body": "Thank you for joining our premium plan."
+}
+{
+    "message": "Email sent successfully."
+}
+
 
